@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聖靈果子詩歌大冒險 🍓✨</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Canvas Confetti for Victory Fireworks -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Google Fonts: Zen Maru Gothic for Cute Japanese Style -->
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Zen Maru Gothic', 'M PLUS Rounded 1c', sans-serif;
+            background: linear-gradient(135deg, #fff5f7 0%, #ffe4e6 50%, #f0fdf4 100%);
+            min-height: 100vh;
+        }
+
+        /* Kawaii Custom Styles */
+        .kawaii-card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(10px);
+            border: 4px solid #fbcfe8;
+            box-shadow: 0 10px 25px -5px rgba(244, 114, 182, 0.2), 0 8px 10px -6px rgba(244, 114, 182, 0.2);
+            border-radius: 2rem;
+        }
+
+        .kawaii-btn {
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .kawaii-btn:hover:not(:disabled) {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 8px 15px rgba(236, 72, 153, 0.3);
+        }
+        .kawaii-btn:active:not(:disabled) {
+            transform: translateY(1px) scale(0.98);
+        }
+
+        .fruit-badge {
+            transition: all 0.3s ease;
+        }
+        .fruit-badge.unlocked {
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .fruit-badge.locked {
+            filter: grayscale(100%) opacity(0.35);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0) rotate(-15deg); opacity: 0; }
+            70% { transform: scale(1.2) rotate(10deg); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        @keyframes floatAnim {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .floating {
+            animation: floatAnim 3s ease-in-out infinite;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #fce7f3;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #f472b6;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="text-gray-700 flex flex-col justify-between p-3 md:p-6 min-h-screen">
+
+    <!-- HEADER / LOGO -->
+    <header class="text-center my-2 md:my-4">
+        <h1 class="text-3xl md:text-5xl font-black text-pink-500 tracking-wider floating drop-shadow-md flex items-center justify-center gap-2">
+            <span>🍓</span> 聖靈果子詩歌大冒險 <span>🕊️</span>
+        </h1>
+        <p class="text-xs md:text-sm font-bold text-pink-400 mt-1">「聖靈所結的果子，就是仁愛、喜樂、和平、忍耐、恩慈、良善、信實、溫柔、節制。」(加拉太書 5:22-23)</p>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-4xl w-full mx-auto flex-grow flex flex-col justify-center my-2">
+
+        <!-- STEP 1: TEAM INPUT SCREEN -->
+        <section id="screen-input" class="kawaii-card p-6 md:p-10 text-center max-w-lg mx-auto w-full">
+            <div class="text-5xl mb-4">🎀</div>
+            <h2 class="text-2xl font-black text-pink-600 mb-2">歡迎來到詩歌大冒險！</h2>
+            <p class="text-sm font-bold text-gray-500 mb-6">請三位小勇士輸入隊名/姓名開始遊戲：</p>
+            
+            <form onsubmit="handleStartGame(event)" class="space-y-4">
+                <div>
+                    <label class="block text-left text-xs font-black text-pink-500 mb-1 ml-2">玩家 1 隊名：</label>
+                    <input type="text" id="p1-name" required placeholder="例如: 喜樂羊羊 🐑" class="w-full px-4 py-3 rounded-2xl border-2 border-pink-200 focus:border-pink-400 focus:outline-none text-center font-bold text-gray-700 bg-pink-50/50">
+                </div>
+                <div>
+                    <label class="block text-left text-xs font-black text-purple-500 mb-1 ml-2">玩家 2 隊名：</label>
+                    <input type="text" id="p2-name" required placeholder="例如: 信實小鹿 🦌" class="w-full px-4 py-3 rounded-2xl border-2 border-purple-200 focus:border-purple-400 focus:outline-none text-center font-bold text-gray-700 bg-purple-50/50">
+                </div>
+                <div>
+                    <label class="block text-left text-xs font-black text-teal-500 mb-1 ml-2">玩家 3 隊名：</label>
+                    <input type="text" id="p3-name" required placeholder="例如: 溫柔鴿子 🕊️" class="w-full px-4 py-3 rounded-2xl border-2 border-teal-200 focus:border-teal-400 focus:outline-none text-center font-bold text-gray-700 bg-teal-50/50">
+                </div>
+                <button type="submit" class="kawaii-btn w-full mt-4 bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 text-white font-black py-4 rounded-2xl shadow-lg border-b-4 border-pink-600 text-lg">
+                    踏上旅程 🚀
+                </button>
+            </form>
+        </section>
+
+        <!-- STEP 2: INSTRUCTIONS SCREEN -->
+        <section id="screen-instructions" class="kawaii-card p-6 md:p-8 text-center max-w-xl mx-auto w-full hidden">
+            <div class="text-5xl mb-3">📖</div>
+            <h2 class="text-2xl font-black text-purple-600 mb-4">遊戲規則說明</h2>
+            
+            <div class="text-left space-y-3 bg-purple-50/60 p-4 rounded-2xl text-xs md:text-sm font-bold text-purple-900 leading-relaxed mb-6 border border-purple-100">
+                <p>1. ✨ <strong>三位勇士對戰</strong>：看歌詞猜詩歌名稱，鬥快集齊9個不同的聖靈果子！</p>
+                <p>2. 🎼 <strong>進階歌詞考驗</strong>：歌詞中隱藏了歌名關鍵字，考考大家的屬靈靈敏度！</p>
+                <p>3. 🍇 <strong>果子解鎖與重複</strong>：答對1題可解鎖果子（前8個不重複，第9個會重複，第10題剛好集齊第9種果子！）。</p>
+                <p>4. ❌ <strong>答錯扣果與補答</strong>：答錯會被扣除1個果子，但<strong>其他玩家可以繼續補答此題</strong>！</p>
+                <p>5. 🎧 <strong>音樂欣賞</strong>：答對後可開啟 YouTube 音樂連結收聽美妙詩歌！</p>
+            </div>
+
+            <div class="flex gap-4">
+                <button onclick="startGamePlay()" class="kawaii-btn flex-1 bg-gradient-to-r from-green-400 to-emerald-400 hover:from-green-500 hover:to-emerald-500 text-white font-black py-3 rounded-2xl shadow-md border-b-4 border-emerald-600 text-base">
+                    理解，開始遊戲！ 🎮
+                </button>
+                <button onclick="startGamePlay()" class="kawaii-btn bg-gray-200 hover:bg-gray-300 text-gray-600 font-bold px-6 py-3 rounded-2xl border-b-4 border-gray-400 text-base">
+                    略過 ⏩
+                </button>
+            </div>
+        </section>
+
+        <!-- STEP 3: MAIN GAMEPLAY SCREEN -->
+        <section id="screen-gameplay" class="space-y-4 hidden">
+            
+            <!-- PLAYERS SCOREBOARD -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <!-- PLAYER 1 -->
+                <div class="bg-white/90 p-4 rounded-2xl border-2 border-pink-300 shadow-sm flex flex-col justify-between">
+                    <div class="flex justify-between items-center mb-2">
+                        <span id="p1-title" class="font-black text-pink-600 truncate max-w-[120px]">玩家 1</span>
+                        <span id="p1-count" class="text-xs bg-pink-100 text-pink-700 px-2.5 py-1 rounded-full font-black">0 / 9 種 (共0顆)</span>
+                    </div>
+                    <div id="p1-fruits-grid" class="grid grid-cols-9 gap-1 bg-pink-50/50 p-2 rounded-xl text-center text-lg min-h-[42px] items-center">
+                        <!-- Fruit Badges populated by JS -->
+                    </div>
+                </div>
+
+                <!-- PLAYER 2 -->
+                <div class="bg-white/90 p-4 rounded-2xl border-2 border-purple-300 shadow-sm flex flex-col justify-between">
+                    <div class="flex justify-between items-center mb-2">
+                        <span id="p2-title" class="font-black text-purple-600 truncate max-w-[120px]">玩家 2</span>
+                        <span id="p2-count" class="text-xs bg-purple-100 text-purple-700 px-2.5 py-1 rounded-full font-black">0 / 9 種 (共0顆)</span>
+                    </div>
+                    <div id="p2-fruits-grid" class="grid grid-cols-9 gap-1 bg-purple-50/50 p-2 rounded-xl text-center text-lg min-h-[42px] items-center">
+                        <!-- Fruit Badges populated by JS -->
+                    </div>
+                </div>
+
+                <!-- PLAYER 3 -->
+                <div class="bg-white/90 p-4 rounded-2xl border-2 border-teal-300 shadow-sm flex flex-col justify-between">
+                    <div class="flex justify-between items-center mb-2">
+                        <span id="p3-title" class="font-black text-teal-600 truncate max-w-[120px]">玩家 3</span>
+                        <span id="p3-count" class="text-xs bg-teal-100 text-teal-700 px-2.5 py-1 rounded-full font-black">0 / 9 種 (共0顆)</span>
+                    </div>
+                    <div id="p3-fruits-grid" class="grid grid-cols-9 gap-1 bg-teal-50/50 p-2 rounded-xl text-center text-lg min-h-[42px] items-center">
+                        <!-- Fruit Badges populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- QUESTION CARD -->
+            <div class="kawaii-card p-5 md:p-8 text-center space-y-4">
+                <div class="inline-block bg-yellow-100 text-yellow-800 text-xs font-black px-3 py-1 rounded-full border border-yellow-300 mb-1">
+                    🎼 請猜出以下歌詞來自哪一首詩歌（難度升級：歌詞不含歌名！）：
+                </div>
+
+                <!-- LYRICS CONTAINER -->
+                <div id="lyrics-box" class="bg-amber-50/60 p-4 md:p-6 rounded-2xl border-2 border-amber-200 text-amber-900 font-bold text-base md:text-xl leading-relaxed tracking-wide shadow-inner">
+                    <!-- Lyrics inserted by JS -->
+                </div>
+
+                <!-- OPTIONS GRID (5 CHOICE BUTTONS) -->
+                <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+                    <!-- Option Buttons inserted by JS -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL 1: ANSWER CORRECT (SELECT PLAYER & UNLOCK FRUIT) -->
+    <div id="modal-reward" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div class="kawaii-card bg-white p-6 md:p-8 max-w-md w-full text-center space-y-4 shadow-2xl">
+            
+            <div id="reward-step-select" class="space-y-4">
+                <div class="text-5xl">🎉</div>
+                <h3 class="text-2xl font-black text-pink-500">回答正確！</h3>
+                <p class="text-sm font-bold text-gray-600">請選擇是哪一位勇士答對此題？</p>
+                <div class="space-y-2 pt-2">
+                    <button onclick="awardFruitToPlayer(0)" class="kawaii-btn w-full py-3 bg-pink-100 hover:bg-pink-200 text-pink-700 font-black rounded-xl border border-pink-300 text-base" id="btn-award-p1">玩家 1</button>
+                    <button onclick="awardFruitToPlayer(1)" class="kawaii-btn w-full py-3 bg-purple-100 hover:bg-purple-200 text-purple-700 font-black rounded-xl border border-purple-300 text-base" id="btn-award-p2">玩家 2</button>
+                    <button onclick="awardFruitToPlayer(2)" class="kawaii-btn w-full py-3 bg-teal-100 hover:bg-teal-200 text-teal-700 font-black rounded-xl border border-teal-300 text-base" id="btn-award-p3">玩家 3</button>
+                </div>
+            </div>
+
+            <div id="reward-step-result" class="space-y-4 hidden">
+                <div class="text-6xl my-2 floating" id="reward-fruit-icon">🍎</div>
+                <h4 class="text-xl font-black text-purple-600" id="reward-player-msg">P1 解鎖了！</h4>
+                <div class="inline-block bg-pink-100 text-pink-700 px-4 py-1 rounded-full font-black text-lg" id="reward-fruit-name">
+                    仁愛果子！
+                </div>
+                <p class="text-xs text-gray-500 font-bold" id="reward-repeat-tag"></p>
+
+                <!-- YOUTUBE LINK AREA -->
+                <div class="bg-red-50 p-3 rounded-xl border border-red-200 text-center space-y-2">
+                    <p class="text-xs font-bold text-red-600">🎧 收聽這首詩歌：</p>
+                    <a id="youtube-link" href="#" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white font-bold px-4 py-2 rounded-lg text-xs transition">
+                        <span>▶️</span> 在 YouTube 開啟收聽
+                    </a>
+                </div>
+
+                <button onclick="nextQuestion()" class="kawaii-btn w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 rounded-xl border-b-4 border-pink-700 text-base">
+                    繼續下一題 ➡️
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODAL 2: ANSWER WRONG (PUNISHMENT SELECT PLAYER) -->
+    <div id="modal-punish" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div class="kawaii-card bg-white p-6 md:p-8 max-w-md w-full text-center space-y-4 shadow-2xl">
+            
+            <div id="punish-step-select" class="space-y-4">
+                <div class="text-5xl">😭</div>
+                <h3 class="text-2xl font-black text-red-500">哎呀！答錯了！</h3>
+                <p class="text-sm font-bold text-gray-600">請選擇是哪一位勇士搶答失敗？（將隨機扣除其1顆果子）</p>
+                <div class="space-y-2 pt-2">
+                    <button onclick="punishPlayer(0)" class="kawaii-btn w-full py-3 bg-red-100 hover:bg-red-200 text-red-700 font-black rounded-xl border border-red-300 text-base" id="btn-punish-p1">玩家 1</button>
+                    <button onclick="punishPlayer(1)" class="kawaii-btn w-full py-3 bg-red-100 hover:bg-red-200 text-red-700 font-black rounded-xl border border-red-300 text-base" id="btn-punish-p2">玩家 2</button>
+                    <button onclick="punishPlayer(2)" class="kawaii-btn w-full py-3 bg-red-100 hover:bg-red-200 text-red-700 font-black rounded-xl border border-red-300 text-base" id="btn-punish-p3">玩家 3</button>
+                </div>
+            </div>
+
+            <div id="punish-step-result" class="space-y-4 hidden">
+                <div class="text-5xl my-2" id="punish-fruit-icon">💔</div>
+                <h4 class="text-xl font-black text-red-600 mb-1" id="punish-player-msg">P1 被扣除了...</h4>
+                <div class="inline-block bg-red-100 text-red-700 px-4 py-1 rounded-full font-black text-lg mb-2" id="punish-fruit-name">
+                    仁愛果子！
+                </div>
+                <p class="text-sm text-gray-500 font-bold">沒關係！其他小勇士可以繼續補答此題喔！💪</p>
+
+                <button onclick="closePunishModal()" class="kawaii-btn w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-xl border-b-4 border-amber-700">
+                    繼續搶答此題 🙋‍♂️
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODAL 3: VICTORY SCREEN -->
+    <div id="modal-victory" class="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden">
+        <div class="kawaii-card bg-white p-8 max-w-lg w-full text-center space-y-6 shadow-2xl border-8 border-yellow-300">
+            <div class="text-7xl floating">👑</div>
+            <h2 class="text-3xl md:text-4xl font-black text-yellow-500 drop-shadow-sm" id="winner-name">恭喜 玩家 1 獲勝！</h2>
+            <p class="text-lg font-bold text-pink-600">率先集齊 9 個聖靈果子！🍒🍍🍇</p>
+            
+            <div class="bg-yellow-50 p-6 rounded-2xl border-2 border-yellow-200 text-amber-900 space-y-2">
+                <p class="text-xs font-black text-yellow-600">📖 聖經祝福金句：</p>
+                <p class="font-bold text-base md:text-lg leading-relaxed">
+                    「你要專心仰賴耶和華，不可倚靠自己的聰明，在你一切所行的事上都要認定他，他必指引你的路。」
+                </p>
+                <p class="text-xs text-amber-700 font-bold text-right">—— 箴言 3:5-6</p>
+            </div>
+
+            <button onclick="location.reload()" class="kawaii-btn w-full bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-white font-black py-4 rounded-2xl text-xl shadow-lg border-b-4 border-amber-700">
+                再玩一局 🔄
+            </button>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="text-center text-xs text-pink-400 font-bold my-2">
+        Made with Love & Grace ❤️ 聖靈所結的果子
+    </footer>
+
+    <!-- GAME LOGIC SCRIPT -->
+    <script>
+        // 9 個聖靈果子資料定義
+        const SPIRIT_FRUITS = [
+            { id: "love", name: "仁愛", icon: "🍎", color: "text-red-500" },
+            { id: "joy", name: "喜樂", icon: "🍊", color: "text-orange-500" },
+            { id: "peace", name: "和平", icon: "🍏", color: "text-green-500" },
+            { id: "patience", name: "忍耐", icon: "🍇", color: "text-purple-500" },
+            { id: "kindness", name: "恩慈", icon: "🍑", color: "text-pink-400" },
+            { id: "goodness", name: "良善", icon: "🍓", color: "text-rose-500" },
+            { id: "faithfulness", name: "信實", icon: "🍍", color: "text-yellow-500" },
+            { id: "gentleness", name: "溫柔", icon: "🍐", color: "text-emerald-500" },
+            { id: "selfcontrol", name: "節制", icon: "🍒", color: "text-red-600" }
+        ];
+
+        // 60 首詩歌題庫 (廣東話為主、普通話為副，歌詞均剔除歌名關鍵字)
+        const SONG_DATABASE = [
+            { title: "寶貴十字架 (廣東話)", lyrics: ["赦免我過犯", "祢寶血洗淨我身", "因祢犧牲顯出至大憐憫"], url: "https://www.youtube.com/results?search_query=寶貴十字架" },
+            { title: "恩典太美麗 (廣東話)", lyrics: ["無人能及這深愛", "帶我走出黑暗走進光明", "祢的溫柔把我完全包圍"], url: "https://www.youtube.com/results?search_query=恩典太美麗" },
+            { title: "全能父上帝 (廣東話)", lyrics: ["祢大能無人能及", "天地萬物都敬拜祢", "列邦列國要歌頌祢名"], url: "https://www.youtube.com/results?search_query=全能父上帝" },
+            { title: "主是我力量 (廣東話)", lyrics: ["是我盾牌與避難所", "在我患難中祢隨時幫助", "我必不致搖動"], url: "https://www.youtube.com/results?search_query=主是我力量" },
+            { title: "神是愛 (廣東話)", lyrics: ["祂愛世上所有人", "送下獨生子賜給我們", "使我們得著永遠的生命"], url: "https://www.youtube.com/results?search_query=神是愛" },
+            { title: "一生跟隨祢 (廣東話)", lyrics: ["走過每段路途", "因祢慈愛永不改變", "獻上我一生為祢所用"], url: "https://www.youtube.com/results?search_query=一生跟隨祢" },
+            { title: "祢是我神 (廣東話)", lyrics: ["我心單單仰望祢", "祢的慈愛高過諸天", "祢的信實達到穹蒼"], url: "https://www.youtube.com/results?search_query=祢是我神" },
+            { title: "讚美大能主 (廣東話)", lyrics: ["榮耀歸於至高者", "諸天述說祢的榮美", "穹蒼傳揚祢的手筆"], url: "https://www.youtube.com/results?search_query=讚美大能主" },
+            { title: "向高山舉目 (廣東話)", lyrics: ["我的幫助從何而來", "從造天地的耶和華而來", "祂必不叫你的腳搖動"], url: "https://www.youtube.com/results?search_query=向高山舉目" },
+            { title: "耶和華祝福滿滿 (廣東話)", lyrics: ["田中的白鷺絲無人看顧", "上帝尚且照顧牠", "何況祢所深愛的兒女"], url: "https://www.youtube.com/results?search_query=耶和華祝福滿滿" },
+            { title: "祢是我尊貴的主 (廣東話)", lyrics: ["我獻上敬拜給祢", "願祢名在全地被尊崇", "萬膝要跪拜萬口要承認"], url: "https://www.youtube.com/results?search_query=祢是我尊貴的主" },
+            { title: "生命的泉源 (廣東話)", lyrics: ["在我心中湧流不息", "使我心靈不再乾渴", "賜我永遠的活水"], url: "https://www.youtube.com/results?search_query=生命的泉源" },
+            { title: "主的愛比天高 (廣東話)", lyrics: ["比汪洋大海更深沉", "永遠包容我的過錯", "牽引我走過風雨"], url: "https://www.youtube.com/results?search_query=主的愛比天高" },
+            { title: "軟弱得改變 (廣東話)", lyrics: ["在祢裡面我得重生成全", "困苦變為剛強", "貧窮變為富足"], url: "https://www.youtube.com/results?search_query=軟弱得改變" },
+            { title: "禱告的力量 (廣東話)", lyrics: ["當我跪下呼求", "祢聽見我的心聲", "賜下平靜與安息"], url: "https://www.youtube.com/results?search_query=禱告的力量" },
+            { title: "全心讚美祢 (廣東話)", lyrics: ["因祢在我們中間行了大事", "祢的名在全地何其美", "我要開口歌頌祢的偉大"], url: "https://www.youtube.com/results?search_query=全心讚美祢" },
+            { title: "我的燈需要油 (廣東話)", lyrics: ["求主常賜給活水", "使我光明照耀到永恆", "等待主榮耀再來"], url: "https://www.youtube.com/results?search_query=我的燈需要油" },
+            { title: "願祢國度降臨 (廣東話)", lyrics: ["願祢的旨意成全", "在地如同在天上", "我們日用的飲食今日賜給我們"], url: "https://www.youtube.com/results?search_query=願祢國度降臨" },
+            { title: "平安的七彩彩虹 (廣東話)", lyrics: ["天空高掛雲彩虹", "應許寧靜永留存", "至高慈愛永不離棄"], url: "https://www.youtube.com/results?search_query=平安的七彩彩虹" },
+            { title: "高唱和散那 (廣東話)", lyrics: ["榮耀歸於君王", "歡呼聲響徹雲霄", "奉主名來的是應當稱頌的"], url: "https://www.youtube.com/results?search_query=高唱和散那" },
+            { title: "主的恩典夠我用 (廣東話)", lyrics: ["能力在軟弱上顯得完全", "我歡喜誇自己的不足", "因基督的能力覆庇我"], url: "https://www.youtube.com/results?search_query=主的恩典夠我用" },
+            { title: "祢是我心中的詩歌 (廣東話)", lyrics: ["夜間祢賜下安息歌唱", "引導我走義路", "我一生一世要歌頌祢"], url: "https://www.youtube.com/results?search_query=祢是我心中的詩歌" },
+            { title: "愛是不保留 (廣東話)", lyrics: ["常聽說僅有奉獻", "祢卻甘願為我流血", "在木頭上顯明極大慈愛"], url: "https://www.youtube.com/results?search_query=愛是不保留" },
+            { title: "神大愛 (廣東話)", lyrics: ["遠超人所能想像", "拯救我脫離死亡困境", "賜我光明新生命"], url: "https://www.youtube.com/results?search_query=神大愛" },
+            { title: "讚美天父 (廣東話)", lyrics: ["創造天地萬物", "萬物都服在祢腳下", "願一切榮耀都歸給祢"], url: "https://www.youtube.com/results?search_query=讚美天父" },
+            { title: "榮耀歸主名 (廣東話)", lyrics: ["祂是萬王之王", "祂是萬主之主", "高舉至聖榮耀之名"], url: "https://www.youtube.com/results?search_query=榮耀歸主名" },
+            { title: "耶和華是我的牧者 (廣東話)", lyrics: ["我必不致缺乏", "祂使我躺臥在青草地上", "領我在可安歇的水邊"], url: "https://www.youtube.com/results?search_query=耶和華是我的牧者" },
+            { title: "祢慈愛永遠長存 (廣東話)", lyrics: ["感謝至高主", "因祂本為善", "祂的憐憫每早晨都是新的"], url: "https://www.youtube.com/results?search_query=祢慈愛永遠長存" },
+            { title: "跟隨基督 (廣東話)", lyrics: ["背起木頭走這路程", "不回頭看背後景況", "向著標杆直跑"], url: "https://www.youtube.com/results?search_query=跟隨基督" },
+            { title: "心中的讚美 (廣東話)", lyrics: ["發自內心的敬拜", "獻給至高至聖者", "祢是我生命中的唯一"], url: "https://www.youtube.com/results?search_query=心中的讚美" },
+            { title: "萬物的創造主 (廣東話)", lyrics: ["諸天述說威嚴榮光", "穹蒼傳揚大能手段", "日日夜夜發出歌唱"], url: "https://www.youtube.com/results?search_query=萬物的創造主" },
+            { title: "求主領我 (廣東話)", lyrics: ["引領我腳步前行", "不偏離祢的正路", "直到邁進永恆家鄉"], url: "https://www.youtube.com/results?search_query=求主領我" },
+            { title: "十字架的光芒 (廣東話)", lyrics: ["放光明照亮角落", "帶給世人無限希望", "打破黑暗權勢"], url: "https://www.youtube.com/results?search_query=十字架的光芒" },
+            { title: "愛的光輝 (廣東話)", lyrics: ["如晨光拂照心田", "溫暖我冰冷感覺", "賜我無限溫馨與安寧"], url: "https://www.youtube.com/results?search_query=愛的光輝" },
+            { title: "感謝天父的恩典 (廣東話)", lyrics: ["天天賜下豐盛供給", "飲食衣履皆無所缺", "一心歌頌祢厚恩大德"], url: "https://www.youtube.com/results?search_query=感謝天父的恩典" },
+            { title: "喜樂滿我心 (廣東話)", lyrics: ["主的平靜是我的力量", "天天充滿我心間", "樂意服事周圍親友"], url: "https://www.youtube.com/results?search_query=喜樂滿我心" },
+            { title: "聖靈請祢來 (廣東話)", lyrics: ["請祢降臨這地方", "充滿我們心靈深處", "更新我們的生命與心志"], url: "https://www.youtube.com/results?search_query=聖靈請祢來" },
+            { title: "得勝的歌聲 (廣東話)", lyrics: ["靠著大能者得勝", "勝過世上一切苦難", "唱出歡呼勝利頌歌"], url: "https://www.youtube.com/results?search_query=得勝的歌聲" },
+            { title: "主賜的平安 (廣東話)", lyrics: ["非世人所能給予", "在我心深處流淌", "即便大風浪中也不動搖"], url: "https://www.youtube.com/results?search_query=主賜的平安" },
+            { title: "永恆的家鄉 (廣東話)", lyrics: ["這世界非我終點", "我有更美的居住處", "在天父無盡榮耀裡"], url: "https://www.youtube.com/results?search_query=永恆的家鄉" },
+            // 普通話詩歌 (均剔除歌名關鍵字)
+            { title: "野地的花 (普通話)", lyrics: ["黑夜鋪蓋白天成長", "小小的花朵上帝照顧", "你看天空飛翔的鳥兒"], url: "https://www.youtube.com/results?search_query=野地的花" },
+            { title: "奇異恩典 (普通話)", lyrics: ["何等甘甜美好", "前我失喪今被尋回", "瞎眼今得看見"], url: "https://www.youtube.com/results?search_query=奇異恩典" },
+            { title: "讚美之泉 (普通話)", lyrics: ["從天父而來的愛與雅歌", "亮麗在我們中間", "祢的愛使我們相聚敬拜"], url: "https://www.youtube.com/results?search_query=讚美之泉" },
+            { title: "這一生最美的祝福 (普通話)", lyrics: ["就是能認識救主", "走過高山低谷祂都看顧", "是我生命中最大的恩典"], url: "https://www.youtube.com/results?search_query=這一生最美的祝福" },
+            { title: "盛曉玫-泥土 (普通話)", lyrics: ["主祢是窯匠我是受造物", "陶造我合祢心意", "打破我塑造我新的生命"], url: "https://www.youtube.com/results?search_query=盛曉玫+泥土" },
+            { title: "盛曉玫-幸福 (普通話)", lyrics: ["是什麼呢", "是心裡有平安", "是生命有永恆希望"], url: "https://www.youtube.com/results?search_query=盛曉玫+幸福" },
+            { title: "祢是我心中的詩歌 (普通話)", lyrics: ["我一生要讚美歌頌祢", "祢的慈愛永遠長存", "夜間賜給我歡唱"], url: "https://www.youtube.com/results?search_query=祢是我心中的詩歌+普通話" },
+            { title: "生命的亮光 (普通話)", lyrics: ["照亮我前行路途", "使我不再走在黑暗中", "跟隨祢走光明義路"], url: "https://www.youtube.com/results?search_query=生命的亮光" },
+            { title: "耶和華坐著為王 (普通話)", lyrics: ["大水滾滾祂依然安穩", "祂必賜力量給祂的百姓", "祂必賜平康的福"], url: "https://www.youtube.com/results?search_query=耶和華坐著為王" },
+            { title: "大山可以挪開 (普通話)", lyrics: ["小山可以遷移", "但主的慈愛永不離開我", "平安的約永不改變"], url: "https://www.youtube.com/results?search_query=大山可以挪開" },
+            { title: "喜樂泉源 (普通話)", lyrics: ["在祢面前有滿足滿足", "右手中有永遠的福樂", "祢是我力量與盾牌"], url: "https://www.youtube.com/results?search_query=喜樂泉源" },
+            { title: "神要開一條路 (普通話)", lyrics: ["在曠野開通道", "在沙漠開江河", "祂必引導我前行"], url: "https://www.youtube.com/results?search_query=神要開一條路" },
+            { title: "如鹿切慕溪水 (普通話)", lyrics: ["神啊我的心渴想祢", "唯有祢是我心所愛", "我渴望來敬拜祢"], url: "https://www.youtube.com/results?search_query=如鹿切慕溪水" },
+            { title: "進入祢的同在 (普通話)", lyrics: ["瞻仰祢的榮美", "在祢聖所中敬拜祢", "聆聽祢微小的聲音"], url: "https://www.youtube.com/results?search_query=進入祢的同在" },
+            { title: "恩典之路 (普通話)", lyrics: ["一步又一步引導", "祢的慈愛一路相隨", "帶領我走向光明"], url: "https://www.youtube.com/results?search_query=恩典之路" },
+            { title: "喜樂的心乃是良藥 (普通話)", lyrics: ["憂傷的靈使骨枯乾", "靠主常歡欣快樂", "願平安覆庇我們"], url: "https://www.youtube.com/results?search_query=喜樂的心乃是良藥" },
+            { title: "榮耀榮耀主 (普通話)", lyrics: ["祂的聖名配受極大讚美", "哈利路亞歌頌天父", "全地都當向祂歡呼"], url: "https://www.youtube.com/results?search_query=榮耀榮耀主" },
+            { title: "新的一天 (普通話)", lyrics: ["清晨醒來感謝天父", "賜下美好的黎明", "祢的信實廣大無邊"], url: "https://www.youtube.com/results?search_query=新的一天" },
+            { title: "主我敬拜祢 (普通話)", lyrics: ["獻上我的心尊崇祢", "祢配得一切尊榮", "我高舉祢聖潔的名"], url: "https://www.youtube.com/results?search_query=主我敬拜祢" },
+            { title: "天父的世界 (普通話)", lyrics: ["我們聆聽萬物歌唱", "晨星歌唱飛鳥吟詠", "萬有皆述說天工奇妙"], url: "https://www.youtube.com/results?search_query=天父的世界" }
+        ];
+
+        // 狀態管理
+        let players = [
+            { name: "", fruits: [] },
+            { name: "", fruits: [] },
+            { name: "", fruits: [] }
+        ];
+
+        let availableSongs = []; // 未使用過的詩歌池
+        let currentQuestion = null;
+        let wrongAnswersThisQuestion = []; // 本題已答錯的選項題目
+
+        // 初始化遊戲，輸入隊名
+        function handleStartGame(e) {
+            e.preventDefault();
+            const p1 = document.getElementById('p1-name').value.trim();
+            const p2 = document.getElementById('p2-name').value.trim();
+            const p3 = document.getElementById('p3-name').value.trim();
+
+            if (!p1 || !p2 || !p3) {
+                alert("請三位玩家都輸入隊名喔！");
+                return;
+            }
+
+            players[0].name = p1;
+            players[1].name = p2;
+            players[2].name = p3;
+
+            // 切換畫面至說明頁
+            document.getElementById('screen-input').classList.add('hidden');
+            document.getElementById('screen-instructions').classList.remove('hidden');
+        }
+
+        // 開始進行遊戲
+        function startGamePlay() {
+            document.getElementById('screen-instructions').classList.add('hidden');
+            document.getElementById('screen-gameplay').classList.remove('hidden');
+
+            // 更新玩家標題
+            document.getElementById('p1-title').innerText = players[0].name;
+            document.getElementById('p2-title').innerText = players[1].name;
+            document.getElementById('p3-title').innerText = players[2].name;
+
+            document.getElementById('btn-award-p1').innerText = players[0].name;
+            document.getElementById('btn-award-p2').innerText = players[1].name;
+            document.getElementById('btn-award-p3').innerText = players[2].name;
+
+            document.getElementById('btn-punish-p1').innerText = players[0].name;
+            document.getElementById('btn-punish-p2').innerText = players[1].name;
+            document.getElementById('btn-punish-p3').innerText = players[2].name;
+
+            // 初始化題庫
+            availableSongs = [...SONG_DATABASE];
+
+            updateUI();
+            loadNextQuestion();
+        }
+
+        // 載入題目 (從未抽過的池子中抽題，確保不重複)
+        function loadNextQuestion() {
+            wrongAnswersThisQuestion = []; // 清空本題答錯紀錄
+
+            if (availableSongs.length === 0) {
+                // 若60首抽完重新洗牌
+                availableSongs = [...SONG_DATABASE];
+            }
+
+            // 隨機選出一首正解並從未抽池中移除
+            const randomIndex = Math.floor(Math.random() * availableSongs.length);
+            const correctSong = availableSongs.splice(randomIndex, 1)[0];
+
+            // 從全庫中選4個干擾項
+            let wrongSongs = SONG_DATABASE.filter(s => s.title !== correctSong.title);
+            wrongSongs.sort(() => Math.random() - 0.5);
+            const selectedOptions = [correctSong, ...wrongSongs.slice(0, 4)];
+            selectedOptions.sort(() => Math.random() - 0.5);
+
+            currentQuestion = {
+                song: correctSong,
+                options: selectedOptions
+            };
+
+            // 渲染歌詞
+            const lyricsBox = document.getElementById('lyrics-box');
+            lyricsBox.innerHTML = currentQuestion.song.lyrics
+                .map(line => `<p class="py-1">「 ${line} 」</p>`)
+                .join('');
+
+            // 渲染 5 個選項按鈕
+            renderOptions();
+        }
+
+        // 渲染 5 個選項按鈕（若已答錯則禁用該選項）
+        function renderOptions() {
+            const optionsGrid = document.getElementById('options-grid');
+            optionsGrid.innerHTML = '';
+            
+            currentQuestion.options.forEach((opt, idx) => {
+                const isWrong = wrongAnswersThisQuestion.includes(opt.title);
+                const btn = document.createElement('button');
+                
+                if (isWrong) {
+                    btn.className = "kawaii-btn text-left p-4 rounded-xl border-2 border-red-200 bg-red-50 font-bold text-red-400 text-sm flex items-center gap-3 cursor-not-allowed opacity-60";
+                    btn.disabled = true;
+                    btn.innerHTML = `<span class="w-7 h-7 rounded-full bg-red-200 text-red-600 text-xs flex items-center justify-center font-black">❌</span> ${opt.title}`;
+                } else {
+                    btn.className = "kawaii-btn text-left p-4 rounded-xl border-2 border-purple-100 bg-purple-50/50 hover:bg-purple-100 font-bold text-gray-700 text-sm flex items-center gap-3";
+                    btn.onclick = () => checkAnswer(opt.title);
+                    btn.innerHTML = `<span class="w-7 h-7 rounded-full bg-purple-200 text-purple-700 text-xs flex items-center justify-center font-black">${idx + 1}</span> ${opt.title}`;
+                }
+                optionsGrid.appendChild(btn);
+            });
+        }
+
+        // 判斷答案
+        function checkAnswer(selectedTitle) {
+            if (selectedTitle === currentQuestion.song.title) {
+                // 答對，彈出獎勵選擇彈窗
+                document.getElementById('reward-step-select').classList.remove('hidden');
+                document.getElementById('reward-step-result').classList.add('hidden');
+                document.getElementById('modal-reward').classList.remove('hidden');
+            } else {
+                // 記錄本題已被選錯的選項
+                if (!wrongAnswersThisQuestion.includes(selectedTitle)) {
+                    wrongAnswersThisQuestion.push(selectedTitle);
+                }
+                // 答錯，彈出懲罰彈窗
+                document.getElementById('punish-step-select').classList.remove('hidden');
+                document.getElementById('punish-step-result').classList.add('hidden');
+                document.getElementById('modal-punish').classList.remove('hidden');
+            }
+        }
+
+        // 答對給予果子
+        function awardFruitToPlayer(playerIndex) {
+            const player = players[playerIndex];
+            const currentTotalCount = player.fruits.length;
+            const uniqueTypes = new Set(player.fruits.map(f => f.id));
+
+            let assignedFruit = null;
+            let isRepeat = false;
+
+            if (currentTotalCount < 8) {
+                // 前 8 個：保證獲得不重複的果子
+                const unobtained = SPIRIT_FRUITS.filter(f => !uniqueTypes.has(f.id));
+                assignedFruit = unobtained[Math.floor(Math.random() * unobtained.length)];
+            } else if (currentTotalCount === 8) {
+                // 第 9 個：必定重複（從已獲得的8個中挑選1個）
+                const obtained = SPIRIT_FRUITS.filter(f => uniqueTypes.has(f.id));
+                assignedFruit = obtained[Math.floor(Math.random() * obtained.length)];
+                isRepeat = true;
+            } else {
+                // 第 10 個：解鎖最後一個尚未獲得的果子，集齊 9 個！
+                const unobtained = SPIRIT_FRUITS.filter(f => !uniqueTypes.has(f.id));
+                if (unobtained.length > 0) {
+                    assignedFruit = unobtained[0];
+                } else {
+                    assignedFruit = SPIRIT_FRUITS[Math.floor(Math.random() * SPIRIT_FRUITS.length)];
+                }
+            }
+
+            // 加入玩家庫中
+            player.fruits.push(assignedFruit);
+            updateUI();
+
+            // 展示解鎖成果 UI
+            document.getElementById('reward-step-select').classList.add('hidden');
+            document.getElementById('reward-step-result').classList.remove('hidden');
+
+            document.getElementById('reward-fruit-icon').innerText = assignedFruit.icon;
+            document.getElementById('reward-player-msg').innerText = `恭喜 ${player.name}！`;
+            document.getElementById('reward-fruit-name').innerText = `獲得了【${assignedFruit.name}】果子！`;
+
+            const repeatTag = document.getElementById('reward-repeat-tag');
+            if (isRepeat) {
+                repeatTag.innerText = "⚡ 這是重複的果子喔！差最後一顆就集齊了，加油！";
+                repeatTag.className = "text-xs text-amber-600 font-bold";
+            } else {
+                repeatTag.innerText = "✨ 太棒了！這是全新的果子！";
+                repeatTag.className = "text-xs text-green-600 font-bold";
+            }
+
+            // 設定 YouTube 連結
+            document.getElementById('youtube-link').href = currentQuestion.song.url;
+
+            // 檢查是否達到勝利條件 (集齊 9 種不同的果子)
+            const newUniqueCount = new Set(player.fruits.map(f => f.id)).size;
+            if (newUniqueCount >= 9) {
+                setTimeout(() => {
+                    triggerVictory(player.name);
+                }, 1000);
+            }
+        }
+
+        // 答錯扣除果子
+        function punishPlayer(playerIndex) {
+            const player = players[playerIndex];
+
+            document.getElementById('punish-step-select').classList.add('hidden');
+            document.getElementById('punish-step-result').classList.remove('hidden');
+
+            if (player.fruits.length > 0) {
+                // 隨機扣除一顆現有的果子
+                const removeIdx = Math.floor(Math.random() * player.fruits.length);
+                const removedFruit = player.fruits.splice(removeIdx, 1)[0];
+                
+                document.getElementById('punish-fruit-icon').innerText = "💔";
+                document.getElementById('punish-player-msg').innerText = `${player.name} 答錯了！`;
+                document.getElementById('punish-fruit-name').innerText = `痛失了【${removedFruit.name}】果子！`;
+            } else {
+                document.getElementById('punish-fruit-icon').innerText = "🛡️";
+                document.getElementById('punish-player-msg').innerText = `${player.name} 答錯了！`;
+                document.getElementById('punish-fruit-name').innerText = "目前身上沒有果子可扣除！";
+            }
+
+            updateUI();
+        }
+
+        // 關閉答錯彈窗並回到原題讓其他玩家補答
+        function closePunishModal() {
+            document.getElementById('modal-punish').classList.add('hidden');
+            
+            // 更新選項狀態（將答錯的選項禁用）
+            renderOptions();
+
+            // 若所有干擾選項都被選過，則直接載入下一題
+            if (wrongAnswersThisQuestion.length >= 4) {
+                loadNextQuestion();
+            }
+        }
+
+        function nextQuestion() {
+            document.getElementById('modal-reward').classList.add('hidden');
+            loadNextQuestion();
+        }
+
+        // 更新 UI 介面（計分板與果子小徽章）
+        function updateUI() {
+            players.forEach((p, idx) => {
+                const uniqueTypes = new Set(p.fruits.map(f => f.id));
+                const countText = document.getElementById(`p${idx + 1}-count`);
+                countText.innerText = `${uniqueTypes.size} / 9 種 (共${p.fruits.length}顆)`;
+
+                const grid = document.getElementById(`p${idx + 1}-fruits-grid`);
+                grid.innerHTML = '';
+
+                SPIRIT_FRUITS.forEach(fruit => {
+                    const hasFruit = p.fruits.some(f => f.id === fruit.id);
+                    const badge = document.createElement('span');
+                    badge.className = `fruit-badge flex items-center justify-center p-1 rounded-lg text-xl ${hasFruit ? 'unlocked' : 'locked'}`;
+                    badge.title = `${fruit.name} ${hasFruit ? '✅' : '🔒'}`;
+                    badge.innerText = fruit.icon;
+                    grid.appendChild(badge);
+                });
+            });
+        }
+
+        // 觸發勝利慶祝畫面
+        function triggerVictory(winnerName) {
+            document.getElementById('modal-reward').classList.add('hidden');
+            document.getElementById('modal-victory').classList.remove('hidden');
+            document.getElementById('winner-name').innerText = `🎉 恭喜 ${winnerName} 獲勝！`;
+
+            // 發射彩色煙花 (Confetti)
+            const duration = 4 * 1000;
+            const end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 7,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 }
+                });
+                confetti({
+                    particleCount: 7,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 }
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            })();
+        }
+    </script>
+</body>
+</html>
